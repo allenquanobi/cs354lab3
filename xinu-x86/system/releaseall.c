@@ -1,6 +1,5 @@
 /*	releaseall.c - releaseall	*/
 #include <xinu.h>
-#define INT_MIN (-2147483647 - 1)
 /* Lab 3: Complete this function */
 int isLockHeld(int ldesc);
 void makeReady(struct lockent *lptr, int pid, int lockid, int type);
@@ -26,10 +25,8 @@ syscall releaseall (int32 numlocks, ...) {
 			returnValue = SYSERR;
 			continue;
 		}
-		//kprintf("wat\n");
 		resetPrio(ldes, currpid);
 		lptr = &locks[ldes];
-		//kprintf("lptr->lqhead in releaseall before nonempty, should be 400: %d\n");
 		proctab[currpid].locks[ldes] = 0;
 		lptr->procArray[currpid] = 0;
 		int j = 0;
@@ -56,14 +53,8 @@ syscall releaseall (int32 numlocks, ...) {
 				}
 				proctab[queuetab[(lptr->lqhead)].qnext].plock = -1;
 				proctab[queuetab[(lptr->lqhead)].qnext].nlocks--;
-				//kprintf("readying process\n");
-				//kprintf("lptr->lqhead in releaseall, should be same as in lock: %d\n", lptr->lqhead);
 				pid32 tmp = getfirst(lptr->lqhead);
-				//kprintf("getfirst(lptr->lqhead): %d\n", tmp);
-				//kprintf("firstid(readylist): %d\n", firstid(readylist));
-				//kprintf("process name to be readied: %s\n", proctab[tmp].prname);
 				ready(tmp);
-				//kprintf("process has been readied\n");
 			} while (flag && (firstType(lptr->lqhead) == READ));
 		} else {
 			int j = 0;
@@ -79,7 +70,6 @@ syscall releaseall (int32 numlocks, ...) {
 		lptr->lprio = maxWaitQueue();
 		resetPrio(ldes, currpid);
 	}
-	//kprintf("what u know\n");
 	resched();
 	return returnValue;
 }

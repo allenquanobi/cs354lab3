@@ -31,39 +31,19 @@ syscall lock(int32 ldes, int32 type, int32 priority) {
 		restore(mask);
 		return SYSERR;
 	}
-	//kprintf("here\n");
-	//kprintf("lock state: %d\n",locks[lockid].lstate);
 	int shouldPutInWait = 0;
 	lptr = &locks[lockid];
 	if ( READ == type )
 	{
-		//kprintf("ENTERED READ TYPE\n");
-		//kprintf("Entered lock read part of the LOCK func");
 		if (lptr->lstate == LUSED)
 		{
-			//kprintf("locck acquired:%d\n", lockid);
-			lptr->lstate= READ_LOCKED;
-			// updating the Process table with the lock descriptor
-			(prptr = &proctab[currpid])->locks[lockid] =1;
-			prptr->nlocks++;
-			//Indicates which process currently holds the lock
-			lptr->procArray[currpid] = 1;
-			//printf(" Acquired Read lock \n");
-			restore(mask);
-			return (OK);
+			shouldPutInWait = 0;
 		}
 		else if ( lptr->lstate == READ_LOCKED)
 		{
-			// There is already a process which has acquired the lock, so move it to wait queue or put on the lock wait queue
 			if ( priority > lptr->maxWritePrio)
 			{
-				// Give the process the lock
-				//kprintf("lock acquired:%d\n",lockid);
-				(prptr = &proctab[currpid])->locks[lockid] =1;
-				prptr->nlocks++;
-				lptr->procArray[currpid] = 1;	
-				restore(mask);
-				return (OK);
+				shouldPutInWait = 0;
 			}
 			else
 			{
@@ -78,24 +58,14 @@ syscall lock(int32 ldes, int32 type, int32 priority) {
 	}
 	else  //type = WRITE
 	{
-		//kprintf("writer in lock\n");
-		//printf("Trying to Acquire Write Lock, current state = %d \n", lptr->lstate);
 		if (lptr->lstate == LUSED)
-		{	
-			//kprintf("here1\n");
-			//kprintf("lock acquired: %d\n", lockid);
-			lptr->lstate= WRITE_LOCKED;
-			(prptr = &proctab[currpid])->locks[lockid] =1;
-			prptr->nlocks++;
-			lptr->procArray[currpid] = 1;
-			restore(mask);
-			return (OK);
+		{
+			shouldPutInWait = 0;	
 		}
 		else
 		{
 			shouldPutInWait = 1;
 		}
-		//writeLockAcquire(ldes1, priority);
 	}
 	if(shouldPutInWait) {
 		(prptr = &proctab[currpid])->prstate = PR_WAIT;
@@ -104,13 +74,10 @@ syscall lock(int32 ldes, int32 type, int32 priority) {
 		swapPriority(lockid,currpid);
 		insertlockq(currpid,lptr->lqhead,priority,type);
 		prptr->pwaitret = OK;
-		//kprintf("lptr->lqhead before resched in lock, should be 400: %d\n", lptr->lqhead);
 		resched();
-		//kprintf("lptr->lqhead after resched in lock, should be 400: %d\n", lptr->lqhead);
 		lptr->procArray[currpid] = 1;
 		proctab[currpid].locks[lockid] = 1;
 		proctab[currpid].nlocks++;
-		//kprintf("lptr->lqhead before swapPriority, should be 400:%d\n", lptr->lqhead);
 		for(i=0;i<NPROC;i++)
 		{
 			if(proctab[i].plock == lockid)   //now update current process holding this lock, with this proc details
@@ -119,12 +86,20 @@ syscall lock(int32 ldes, int32 type, int32 priority) {
 			}
 
 		}
-		//kprintf("lptr->lqhead after swapPriority, should be 400:%d\n", lptr->lqhead);
 		restore(mask);
 		return prptr->pwaitret;
+	} else {
+		if(type == READ) {
+			lptr->lstate = READ_LOCKED;
+		} else {
+			lptr->lstate = WRITE_LOCKED;
+		}
+		(prptr = &proctab[currpid])->locks[lockid] = 1;
+		prptr->nlocks++;
+		lptr->procArray[currpid] = 1;
+		restore(mask);
+		return OK;
 	}
-	restore(mask);
-	return OK;
 }
 int max(int a, int b) {
 	return (a>b)?a:b;
