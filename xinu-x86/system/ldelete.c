@@ -11,11 +11,11 @@ syscall ldelete(
 	int pid, i, flag = 0;
 	struct lockent *lptr;
 	mask = disable();
-	if(isbadlock(ldesc) || locks[ldesc].lstate == LFREE) {
+	if(isbadlock(ldesc) || locktab[ldesc].lstate == LFREE) {
 		restore(mask);
 		return SYSERR;
 	}
-	lptr = &locks[ldesc];
+	lptr = &locktab[ldesc];
 	lptr->lstate = LFREE;
 	lptr->ltype = -1;
 	lptr->lprio = -1;

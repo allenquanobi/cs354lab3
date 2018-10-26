@@ -22,11 +22,11 @@ local int newlock() {
 		lock = nextlock--;
 		if(nextlock < 0)
 			nextlock = NLOCKS - 1;
-		if(locks[lock].lstate == LFREE){
-			locks[lock].lstate = LUSED;
-			locks[lock].lprio = -1;
+		if(locktab[lock].lstate == LFREE){
+			locktab[lock].lstate = LUSED;
+			locktab[lock].lprio = -1;
 			for(j = 0; j < NPROC; j++) {
-				locks[lock].procArray[j] = 0;
+				locktab[lock].procArray[j] = 0;
 			}
 			return lock;
 		}

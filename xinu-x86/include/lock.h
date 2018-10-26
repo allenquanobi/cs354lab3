@@ -21,7 +21,7 @@ struct	lockent {
 };
 
 /* Lab 3 lock table */
-extern struct lockent locks[];
+extern struct lockent locktab[];
 extern int nextlock;
 #define firstType(head) (queuetab[queuetab[(head)].qnext].qtype)
 #define isbadlock(l) (l < 0 || l >= NLOCKS)

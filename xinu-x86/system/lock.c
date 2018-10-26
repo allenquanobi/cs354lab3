@@ -21,7 +21,7 @@ syscall lock(int32 ldes, int32 type, int32 priority) {
 		restore(mask);
 		return SYSERR;
 	}
-	if(locks[ldes].lstate == LFREE) {
+	if(locktab[ldes].lstate == LFREE) {
 		kprintf("need to create lock first\n");
 		restore(mask);
 		return SYSERR;
@@ -32,7 +32,7 @@ syscall lock(int32 ldes, int32 type, int32 priority) {
 		return SYSERR;
 	}
 	int shouldPutInWait = 0;
-	lptr = &locks[lockid];
+	lptr = &locktab[lockid];
 	if ( READ == type )
 	{
 		if (lptr->lstate == LUSED)
@@ -130,7 +130,7 @@ void swapPriority(int ld, int pid) {
 		restore(mask);
 		return;
 	}
-	struct lockent *lptr = &locks[ld];
+	struct lockent *lptr = &locktab[ld];
 	struct procent *prptr = &proctab[pid];
 	int hprio = lptr->lprio;
 	int cprio = prptr->prprio;
@@ -140,7 +140,7 @@ void swapPriority(int ld, int pid) {
 	}
 	int i = 0;
 	for(i = 0; i < NPROC; i++) {
-		if(locks[ld].procArray[i] > 0) {
+		if(locktab[ld].procArray[i] > 0) {
 			prptr = &proctab[i];
 			int prprio = prptr->prprio;
 			if(prprio < hprio) {

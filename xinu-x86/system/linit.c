@@ -4,14 +4,14 @@
 /* Lab 3: Complete this function */
 
 // declare any global variables here
-struct lockent locks[NLOCKS];
+struct lockent locktab[NLOCKS];
 int nextlock;
 void linit(void) {
 	struct lockent *lptr;
 	int i, j;
 	nextlock = NLOCKS - 1;
 	for(i = 0; i < NLOCKS; i++) {
-		lptr = &locks[i];
+		lptr = &locktab[i];
 		lptr->lstate = LFREE;
 		lptr->lqhead = newqueue();
 		lptr->lprio = -1;

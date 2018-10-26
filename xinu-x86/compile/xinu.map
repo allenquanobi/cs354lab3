@@ -18,7 +18,6 @@ girmask             0x2               binaries/evec.o
 ttytab              0x10c             binaries/ttyinit.o
 proctab             0x6bd0            binaries/initialize.o
 prcount             0x4               binaries/initialize.o
-locks               0x5140            binaries/linit.o
 lck                 0x4               binaries/main.o
 lfltab              0xf00             binaries/lflinit.o
 rdstab              0x8c              binaries/rdsinit.o
@@ -38,6 +37,7 @@ arpcache            0x140             binaries/arp.o
 icmptab             0x230             binaries/icmp.o
 nbpools             0x4               binaries/bufinit.o
 queuetab            0x17a0            binaries/queue.o
+locktab             0x5140            binaries/linit.o
 ptnextid            0x4               binaries/ptinit.o
 Ram                 0x19000           binaries/raminit.o
 ipoqueue            0x2c              binaries/ip.o
@@ -2555,7 +2555,7 @@ Linker script and memory map
  *fill*         0x0000000000128238        0x8 
  COMMON         0x0000000000128240     0x5160 binaries/linit.o
                 0x0000000000128240                nextlock
-                0x0000000000128260                locks
+                0x0000000000128260                locktab
  COMMON         0x000000000012d3a0       0xe8 binaries/main.o
                 0x000000000012d3a0                lck
                 0x000000000012d3c0                lcks

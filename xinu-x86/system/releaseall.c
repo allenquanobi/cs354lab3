@@ -13,7 +13,7 @@ syscall releaseall (int32 numlocks, ...) {
 	unsigned long *a = (unsigned long *)(&numlocks) + (numlocks);
 	for(i = 0; i < numlocks; i++) {
 		ldes = *a--;
-		if(isbadlock(ldes) || (lptr = &locks[ldes])->lstate == LFREE || proctab[currpid].locks[ldes] != 1) {
+		if(isbadlock(ldes) || (lptr = &locktab[ldes])->lstate == LFREE || proctab[currpid].locks[ldes] != 1) {
 			if(proctab[currpid].pwaitret == DELETED) {
 				returnValue = DELETED;
 			} else {
@@ -22,7 +22,7 @@ syscall releaseall (int32 numlocks, ...) {
 			continue;
 		}
 		resetPrio(ldes, currpid);
-		lptr = &locks[ldes];
+		lptr = &locktab[ldes];
 		lptr->lprio = maxWaitQueue();
 		proctab[currpid].locks[ldes] = 0;
 		lptr->procArray[currpid] = 0;
@@ -62,7 +62,7 @@ syscall releaseall (int32 numlocks, ...) {
 	return returnValue;
 }
 int checkUse(int ldes) {
-	struct lockent *lptr = &locks[ldes];
+	struct lockent *lptr = &locktab[ldes];
 	int j = 0;
 	for(j = 0; j < NPROC; j++) {
 		if(lptr->procArray[j] == 1) {
@@ -75,7 +75,7 @@ int maxWaitQueue(int ldes) {
 	struct lockent *lptr;
 	int maxprio = -1;
 	int i;
-	lptr = &locks[ldes];
+	lptr = &locktab[ldes];
 	i = queuetab[lptr->lqhead].qnext;
 	if(nonempty(lptr->lqhead)) {
 		int test = firstkey(lptr->lqhead);
@@ -113,9 +113,9 @@ void resetPrio(int ld, int pid) {
 	}
 	maxprio = prptr->prprio;
 	for(tmplid = 0; tmplid < NLOCKS; tmplid++) {
-		if(locks[tmplid].procArray[pid] > 0) {
-			if(maxprio < locks[tmplid].lprio) {
-				maxprio = locks[tmplid].lprio;
+		if(locktab[tmplid].procArray[pid] > 0) {
+			if(maxprio < locktab[tmplid].lprio) {
+				maxprio = locktab[tmplid].lprio;
 				iflag = 1;
 			}
 		}
