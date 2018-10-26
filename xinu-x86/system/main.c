@@ -206,11 +206,8 @@ void test2()
 	  kprintf(" TEST2: error in lcreate()..DONE\n\r");
 	  return;
 	}
-	kprintf("writer1\n");	
 	resume( create( writer1, 2000, 30, "writer", 3, lck, 1, 0 ));
-	kprintf("writer2\n");
 	resume( create( writer1, 2000, 30, "writer", 3, lck, 2, 0 ));
-	kprintf("writer3\n");
 	resume( create( writer1, 2000, 30, "writer", 3, lck, 3, 0 ));
 
 	/* Wait for the writers to complete and then delete the lock */

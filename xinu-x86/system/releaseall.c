@@ -31,8 +31,6 @@ syscall releaseall (int32 numlocks, ...) {
 		lptr = &locks[ldes];
 		//kprintf("lptr->lqhead in releaseall before nonempty, should be 400: %d\n");
 		proctab[currpid].locks[ldes] = 0;
-		locktab[currpid][ldes].type = NONE;
-		locktab[currpid][ldes].time = -1;
 		lptr->procArray[currpid] = 0;
 		int j = 0;
 		int lockstillused = 0;
@@ -84,37 +82,6 @@ syscall releaseall (int32 numlocks, ...) {
 	//kprintf("what u know\n");
 	resched();
 	return returnValue;
-}
-
-int isLockHeld(int ldesc) {
-	int i;
-	for(i = 0; i < NPROC; i++) {
-		if(locktab[i][ldesc].time == -1 && locktab[i][ldesc].type != NONE) {
-			return 1;
-		}
-	}
-	return 0;
-}
-void resetpriority() {
-	int maxlock=-1,i;
-	for(i=0;i<NLOCKS;i++)  //check all locks held by currpid
-	{
-		if(proctab[currpid].locks[i] > 0)
-		{
-			//for each lock held by this process, find max process priority on each of their wait queues.
-			//i-> lock held by this process.
-
-			maxlock = getMax(maxlock,locks[i].lprio); //compare max prio of processes on wait queue of this lock.
-
-		}
-	}
-
-	if(maxlock > 0)
-		proctab[currpid].pinh = maxlock; //assign this value to pinh
-	else
-		proctab[currpid].pinh = -1; //this will allow us to go back to using pprio instead of pinh.
-
-	priority_inheritance(proctab[currpid].plock, currpid);
 }
 int maxWaitQueue(int ldes) {
 	struct lockent *lptr;

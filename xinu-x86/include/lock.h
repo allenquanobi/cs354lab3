@@ -30,7 +30,6 @@ struct lstat {
 
 /* Lab 3 lock table */
 extern struct lockent locks[];
-extern struct lstat locktab[][NLOCKS];
 extern int nextlock;
 extern int refNum;
 #define firstType(head) (queuetab[queuetab[(head)].qnext].qtype)

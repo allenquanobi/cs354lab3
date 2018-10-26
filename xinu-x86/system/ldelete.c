@@ -27,10 +27,6 @@ syscall ldelete(
 		}
 		resched();
 	}
-	for(i = 0; i < NPROC; i++) {
-		locktab[i][ldesc].time = -1;
-		locktab[i][ldesc].type = NONE;
-	}
 	restore(mask);
 	return OK;
 }

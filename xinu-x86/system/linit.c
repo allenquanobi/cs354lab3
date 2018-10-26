@@ -5,7 +5,6 @@
 
 // declare any global variables here
 struct lockent locks[NLOCKS];
-struct lstat locktab[NPROC][NLOCKS];
 int nextlock;
 int refNum;
 void linit(void) {
@@ -20,11 +19,5 @@ void linit(void) {
 		lptr->lrefNum = -1;
 		lptr->lprio = -1;
 		lptr->maxWritePrio = -1;
-	}
-	for(i = 0; i < NLOCKS; i++) {
-		for(j = 0; j < NLOCKS; j++) {
-			locktab[i][j].time = -1;
-			locktab[i][j].type = NONE;
-		}
 	}
 }
