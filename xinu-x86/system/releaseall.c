@@ -13,7 +13,7 @@ syscall releaseall (int32 numlocks, ...) {
 	unsigned long *a = (unsigned long *)(&numlocks) + (numlocks);
 	for(i = 0; i < numlocks; i++) {
 		ldes = *a--;
-		if(isbadlock(ldes) || (lptr = &locks[ldes])->lstate == LFREE) {
+		if(isbadlock(ldes) || (lptr = &locks[ldes])->lstate == LFREE || proctab[currpid].locks[ldes] != 1) {
 			if(proctab[currpid].pwaitret == DELETED) {
 				returnValue = DELETED;
 			} else {
@@ -21,19 +21,16 @@ syscall releaseall (int32 numlocks, ...) {
 			}
 			continue;
 		}
-		if(proctab[currpid].locks[ldes] != 1) {
-			returnValue = SYSERR;
-			continue;
-		}
 		resetPrio(ldes, currpid);
 		lptr = &locks[ldes];
+		lptr->lprio = maxWaitQueue();
 		proctab[currpid].locks[ldes] = 0;
 		lptr->procArray[currpid] = 0;
 		int j = 0;
 		int stilluse = checkUse(ldes);
 		if(stilluse) {
-			resetPrio(ldes, currpid);
-			lptr->lprio = maxWaitQueue();
+			//resetPrio(ldes, currpid);
+			//lptr->lprio = maxWaitQueue();
 			resched();
 			continue;
 		}
@@ -62,8 +59,8 @@ syscall releaseall (int32 numlocks, ...) {
 				lptr->lstate = LUSED;
 			}
 		}
-		lptr->lprio = maxWaitQueue();
-		resetPrio(ldes, currpid);
+		//lptr->lprio = maxWaitQueue();
+		//resetPrio(ldes, currpid);
 	}
 	resched();
 	return returnValue;
@@ -111,14 +108,14 @@ void resetPrio(int ld, int pid) {
 		return;
 	}
 	if(prptr->nlocks == 0) {
-		prptr->pprio = prptr->oprio;
+		prptr->prprio = prptr->oprio;
 		prptr->oprio = 0;
 		prptr->changePrioFlag = 0;
 		prptr->plock = -1;
 		restore(mask);
 		return;
 	}
-	maxprio = prptr->pprio;
+	maxprio = prptr->prprio;
 	for(tmplid = 0; tmplid < NLOCKS; tmplid++) {
 		if(locks[tmplid].procArray[pid] > 0) {
 			if(maxprio < locks[tmplid].lprio) {
@@ -128,7 +125,7 @@ void resetPrio(int ld, int pid) {
 		}
 	}
 	if(iflag == 1) {
-		prptr->pprio = maxprio;
+		prptr->prprio = maxprio;
 		prptr->changePrioFlag = 1;
 	}
 	restore(mask);

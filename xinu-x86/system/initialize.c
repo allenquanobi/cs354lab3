@@ -131,7 +131,7 @@ static	void	sysinit()
 		prptr->prstate = PR_FREE;
 		prptr->prname[0] = NULLCH;
 		prptr->prstkbase = NULL;
-		prptr->pprio = 0;
+		prptr->prprio = 0;
 		prptr->plock = -1;
 		for(j = 0; j < NLOCKS; j++) {
 			proctab[i].locks[j] = 0;
@@ -145,7 +145,7 @@ static	void	sysinit()
 
 	prptr = &proctab[NULLPROC];
 	prptr->prstate = PR_CURR;
-	prptr->pprio = 0;
+	prptr->prprio = 0;
 	strncpy(prptr->prname, "prnull", 7);
 	prptr->prstkbase = getstk(NULLSTK);
 	prptr->prstklen = NULLSTK;

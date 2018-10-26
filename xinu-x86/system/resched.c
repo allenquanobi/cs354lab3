@@ -28,14 +28,14 @@ void	resched(void)		/* Assumes interrupts are disabled	*/
 	ptold = &proctab[currpid];
 
 	if (ptold->prstate == PR_CURR) {  /* Process remains eligible */
-		if (ptold->pprio > firstkey(readylist)) {
+		if (ptold->prprio > firstkey(readylist)) {
 			return;
 		}
 
 		/* Old process will no longer remain current */
 		
 		ptold->prstate = PR_READY;
-		insert(currpid, readylist, ptold->pprio);
+		insert(currpid, readylist, ptold->prprio);
 	}
 
 	/* Force context switch to highest priority ready process */

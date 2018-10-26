@@ -18,7 +18,7 @@ syscall	getprio(
 		restore(mask);
 		return SYSERR;
 	}
-	prio = proctab[pid].pprio;
+	prio = proctab[pid].prprio;
 	restore(mask);
 	return prio;
 }

@@ -17,6 +17,15 @@ syscall ldelete(
 	}
 	lptr = &locks[ldesc];
 	lptr->lstate = LFREE;
+	lptr->ltype = -1;
+	lptr->lprio = -1;
+	lptr->maxWritePrio = -1;
+	for(i = 0; i < NPROC; i++) {
+		lptr->procArray[i] = 0;
+	}
+	for(i = 0; i < NLOCKS; i++) {
+		proctab[i].locks[ldesc] = 0;
+	}
 	if(nonempty(lptr->lqhead)) {
 		pid = getfirst(lptr->lqhead);
 		while (pid != EMPTY) {

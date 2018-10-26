@@ -65,12 +65,15 @@ syscall lock(int32 ldes, int32 type, int32 priority) {
 		else
 		{
 			shouldPutInWait = 1;
+			if(priority > lptr->maxWritePrio) {
+				lptr->maxWritePrio = priority;
+			}
 		}
 	}
 	if(shouldPutInWait) {
 		(prptr = &proctab[currpid])->prstate = PR_WAIT;
 		prptr->plock = lockid;
-		lptr->lprio = max(lptr->lprio,proctab[currpid].pprio);
+		lptr->lprio = max(lptr->lprio,proctab[currpid].prprio);
 		swapPriority(lockid,currpid);
 		insertlockq(currpid,lptr->lqhead,priority,type);
 		prptr->pwaitret = OK;
@@ -130,7 +133,7 @@ void swapPriority(int ld, int pid) {
 	struct lockent *lptr = &locks[ld];
 	struct procent *prptr = &proctab[pid];
 	int hprio = lptr->lprio;
-	int cprio = prptr->pprio;
+	int cprio = prptr->prprio;
 	if(hprio < cprio) {
 		lptr->lprio = cprio;
 		hprio = cprio;
@@ -139,13 +142,13 @@ void swapPriority(int ld, int pid) {
 	for(i = 0; i < NPROC; i++) {
 		if(locks[ld].procArray[i] > 0) {
 			prptr = &proctab[i];
-			int pprio = prptr->pprio;
-			if(pprio < hprio) {
+			int prprio = prptr->prprio;
+			if(prprio < hprio) {
 				if(prptr->changePrioFlag == 0) {
 					prptr->changePrioFlag = 1;
-					prptr->oprio = pprio;
+					prptr->oprio = prprio;
 				}
-				prptr->pprio = hprio;
+				prptr->prprio = hprio;
 			}
 			swapPriority(proctab[i].plock, i);
 		}

@@ -44,7 +44,7 @@
 
 struct procent {		/* Entry in the process table		*/
 	uint16	prstate;	/* Process state: PR_CURR, etc.		*/
-	pri16	pprio;		/* Process priority			*/
+	pri16	prprio;		/* Process priority			*/
 	char	*prstkptr;	/* Saved stack pointer			*/
 	char	*prstkbase;	/* Base of run time stack		*/
 	uint32	prstklen;	/* Stack length in bytes		*/
@@ -54,12 +54,14 @@ struct procent {		/* Entry in the process table		*/
 	umsg32	prmsg;		/* Message sent to this process		*/
 	bool8	prhasmsg;	/* Nonzero iff msg is valid		*/
 	int16	prdesc[NDESC];	/* Device descriptors for process	*/
-	int	pwaitret;
-	int	locks[NLOCKS];
-	int	nlocks;
-	int 	plock;
-	int 	oprio;
-	int	changePrioFlag;
+	int	pwaitret;	/* Keeps track of the message returned
+				   when lock is acquired, DELETED OR OK	*/
+	int	locks[NLOCKS];	/* All the locks that process is waiting
+				   Or has acquired			*/
+	int	nlocks;		/* Count of locks acquired or waited	*/
+	int 	plock;		/* Refers to the lockid blocking proc	*/
+	int 	oprio;		/* Prio process got during create	*/
+	int	changePrioFlag; /* Keeps track if prprio has been changed*/
 };
 
 /* Marker for the top of a process stack (used to help detect overflow)	*/

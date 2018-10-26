@@ -55,7 +55,7 @@ shellcmd xsh_ps(int nargs, char *args[])
 		}
 		printf("%3d %-16s %s %4d %4d 0x%08X 0x%08X %8d\n",
 			i, prptr->prname, pstate[(int)prptr->prstate],
-			prptr->pprio, prptr->prparent, prptr->prstkbase,
+			prptr->prprio, prptr->prparent, prptr->prstkbase,
 			prptr->prstkptr, prptr->prstklen);
 	}
 	return 0;

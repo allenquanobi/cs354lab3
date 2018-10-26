@@ -35,7 +35,7 @@ syscall	suspend(
 		prptr->prstate = PR_SUSP;   /* Mark the current process	*/
 		resched();		    /*   suspended and resched.	*/
 	}
-	prio = prptr->pprio;
+	prio = prptr->prprio;
 	restore(mask);
 	return prio;
 }

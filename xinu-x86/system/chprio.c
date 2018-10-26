@@ -22,13 +22,13 @@ pri16	chprio(
 	}
 	prptr = &proctab[pid];
 	if(prptr->changePrioFlag == 0) {
-		prptr->pprio = newprio;
+		prptr->prprio = newprio;
 	} else {
 		int oprio = prptr->oprio;
-		int pprio = prptr->pprio;
+		int prprio = prptr->prprio;
 		prptr->oprio = newprio;
-		if(pprio < newprio) {
-			prptr->pprio = newprio;
+		if(prprio < newprio) {
+			prptr->prprio = newprio;
 		}
 	}
 	swapPriority(prptr->plock, pid);
