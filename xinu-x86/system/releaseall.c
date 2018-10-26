@@ -29,8 +29,6 @@ syscall releaseall (int32 numlocks, ...) {
 		int j = 0;
 		int stilluse = checkUse(ldes);
 		if(stilluse) {
-			//resetPrio(ldes, currpid);
-			//lptr->lprio = maxWaitQueue();
 			resched();
 			continue;
 		}
@@ -59,8 +57,6 @@ syscall releaseall (int32 numlocks, ...) {
 				lptr->lstate = LUSED;
 			}
 		}
-		//lptr->lprio = maxWaitQueue();
-		//resetPrio(ldes, currpid);
 	}
 	resched();
 	return returnValue;

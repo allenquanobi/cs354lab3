@@ -111,7 +111,7 @@ int insertlockq(int proc, int head, int key, int type) {
 	int next;
 	int prev;
 	next = firstid(head);
-	while(queuetab[next].qkey >= key) {
+	while(queuetab[next].qkey >= key && (queuetab[next].qtype == READ)) {
 		next = queuetab[next].qnext;
 	}
 	prev = queuetab[next].qprev;
