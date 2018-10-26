@@ -3,7 +3,6 @@
 
 // declare variables, #defines, 
 #define NLOCKS 50
-#define NONE -1
 #define READ 1
 #define WRITE 2
 #define DELETED -20
@@ -16,22 +15,14 @@ struct	lockent {
 	char lstate;
 	qid16 lqhead;
 	int ltype;
-	int lrefNum;
 	int lprio;
 	int procArray[NPROC];
 	int maxWritePrio;
 };
 
-struct lstat {
-	int type;
-	long int time;
-};
-
-
 /* Lab 3 lock table */
 extern struct lockent locks[];
 extern int nextlock;
-extern int refNum;
 #define firstType(head) (queuetab[queuetab[(head)].qnext].qtype)
 #define isbadlock(l) (l < 0 || l >= NLOCKS)
 

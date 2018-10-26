@@ -50,13 +50,13 @@ syscall lock(int32 ldes, int32 type, int32 priority) {
 				shouldPutInWait = 1;
 			}
 		}
-		else // lock currently held by writer process, put in the lock queue
+		else
 		{
 			shouldPutInWait = 1;
 		}
 
 	}
-	else  //type = WRITE
+	else
 	{
 		if (lptr->lstate == LUSED)
 		{
@@ -80,7 +80,7 @@ syscall lock(int32 ldes, int32 type, int32 priority) {
 		proctab[currpid].nlocks++;
 		for(i=0;i<NPROC;i++)
 		{
-			if(proctab[i].plock == lockid)   //now update current process holding this lock, with this proc details
+			if(proctab[i].plock == lockid)
 			{
 				swapPriority(proctab[i].plock,i);
 			}

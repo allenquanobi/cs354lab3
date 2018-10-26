@@ -55,7 +55,6 @@ struct procent {		/* Entry in the process table		*/
 	bool8	prhasmsg;	/* Nonzero iff msg is valid		*/
 	int16	prdesc[NDESC];	/* Device descriptors for process	*/
 	int	pwaitret;
-	int 	pinh;
 	int	locks[NLOCKS];
 	int	nlocks;
 	int 	plock;

@@ -23,12 +23,8 @@ local int newlock() {
 		if(nextlock < 0)
 			nextlock = NLOCKS - 1;
 		if(locks[lock].lstate == LFREE){
-			//kprintf("should go here NLOCKS times\n");
-			++refNum;
 			locks[lock].lstate = LUSED;
 			locks[lock].lprio = -1;
-			//kprintf("lock state when created: %d\n", locks[lock].lstate);
-			locks[lock].lrefNum = lock;
 			for(j = 0; j < NPROC; j++) {
 				locks[lock].procArray[j] = 0;
 			}

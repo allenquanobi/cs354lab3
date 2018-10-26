@@ -132,7 +132,6 @@ static	void	sysinit()
 		prptr->prname[0] = NULLCH;
 		prptr->prstkbase = NULL;
 		prptr->pprio = 0;
-		prptr->pinh = -1;
 		prptr->plock = -1;
 		for(j = 0; j < NLOCKS; j++) {
 			proctab[i].locks[j] = 0;
