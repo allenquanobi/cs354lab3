@@ -21,8 +21,18 @@ pri16	chprio(
 		return (pri16) SYSERR;
 	}
 	prptr = &proctab[pid];
-	oldprio = prptr->pprio;
-	prptr->pprio = newprio;
+	if(prptr->changePrioFlag == 0) {
+		prptr->pprio = newprio;
+	} else {
+		int oprio = prptr->oprio;
+		int pprio = prptr->pprio;
+		prptr->oprio = newprio;
+		if(pprio < newprio) {
+			prptr->pprio = newprio;
+		}
+	}
+	swapPriority(prptr->plock, pid);
+	resched();
 	restore(mask);
 	return oldprio;
 }
