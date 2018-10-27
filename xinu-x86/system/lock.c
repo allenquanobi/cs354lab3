@@ -12,22 +12,22 @@ syscall lock(int32 ldes, int32 type, int32 priority) {
 	mask = disable();
 	prptr = &proctab[currpid];
 	if(prptr->pwaitret == DELETED) {
-		kprintf("deleted lock\n");
+		//kprintf("deleted lock\n");
 		restore(mask);
 		return SYSERR;
 	}
 	if(type != READ && type != WRITE) {
-		kprintf("invalid type \n");
+		//kprintf("invalid type \n");
 		restore(mask);
 		return SYSERR;
 	}
 	if(locktab[ldes].lstate == LFREE) {
-		kprintf("need to create lock first\n");
+		//kprintf("need to create lock first\n");
 		restore(mask);
 		return SYSERR;
 	}
 	if(isbadlock(ldes)) {
-		kprintf("invalid lid\n");
+		//kprintf("invalid lid\n");
 		restore(mask);
 		return SYSERR;
 	}
@@ -36,29 +36,29 @@ syscall lock(int32 ldes, int32 type, int32 priority) {
 	switch(type) {
 		case READ:
 			switch(lptr->lstate) {
-				case LUSED:
+				case LUSED: //lock is free, give lock to calling reader
 					shouldPutInWait = 0;
 					break;
-				case READ_LOCKED:
+				case READ_LOCKED: //lock is not free, perform maxWritePrio check
 					if(priority > lptr->maxWritePrio) {
-						shouldPutInWait = 0;
+						shouldPutInWait = 0; //give lock
 					} else {
-						shouldPutInWait = 1;
+						shouldPutInWait = 1; //place in wait queue
 					}
 					break;
 				default:
-					shouldPutInWait = 1;
+					shouldPutInWait = 1; //lock is write locked, place in wait queue
 			}
 			break;
 		case WRITE:
 			switch(lptr->lstate) {
-				case LUSED:
+				case LUSED: //lock is free, give lock to calling writer
 					shouldPutInWait = 0;
 					break;
 				default:
-					shouldPutInWait = 1;
+					shouldPutInWait = 1; //lock is not free, place writer in wait queue
 					if(priority > lptr->maxWritePrio) {
-						lptr->maxWritePrio = priority;
+						lptr->maxWritePrio = priority; //update maxWritePrio in wait queue
 					}
 			}
 			break;
