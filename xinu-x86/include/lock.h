@@ -16,7 +16,7 @@ struct	lockent {
 	qid16 lqhead;
 	int ltype;
 	int lprio;
-	int procArray[NPROC];
+	int plist[NPROC];
 	int maxWritePrio;
 };
 

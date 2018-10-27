@@ -71,7 +71,7 @@ syscall lock(int32 ldes, int32 type, int32 priority) {
 		insertlockq(currpid,lptr->lqhead,priority,type);
 		prptr->pwaitret = OK;
 		resched();
-		lptr->procArray[currpid] = 1;
+		lptr->plist[currpid] = 1;
 		proctab[currpid].locks[lockid] = 1;
 		proctab[currpid].nlocks++;
 		for(i=0;i<NPROC;i++)
@@ -92,7 +92,7 @@ syscall lock(int32 ldes, int32 type, int32 priority) {
 		}
 		(prptr = &proctab[currpid])->locks[lockid] = 1;
 		prptr->nlocks++;
-		lptr->procArray[currpid] = 1;
+		lptr->plist[currpid] = 1;
 		restore(mask);
 		return OK;
 	}
@@ -133,7 +133,7 @@ void swapPriority(int ld, int pid) {
 	}
 	int i = 0;
 	for(i = 0; i < NPROC; i++) {
-		if(locktab[ld].procArray[i] > 0) {
+		if(locktab[ld].plist[i] > 0) {
 			prptr = &proctab[i];
 			int prprio = prptr->prprio;
 			if(prprio < hprio) {

@@ -21,7 +21,7 @@ syscall ldelete(
 	lptr->lprio = -1;
 	lptr->maxWritePrio = -1;
 	for(i = 0; i < NPROC; i++) {
-		lptr->procArray[i] = 0;
+		lptr->plist[i] = 0;
 	}
 	for(i = 0; i < NLOCKS; i++) {
 		proctab[i].locks[ldesc] = 0;

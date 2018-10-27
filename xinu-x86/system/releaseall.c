@@ -23,7 +23,7 @@ syscall releaseall (int32 numlocks, ...) {
 		lptr = &locktab[ldes];
 		lptr->lprio = maxWaitQueue();
 		proctab[currpid].locks[ldes] = 0;
-		lptr->procArray[currpid] = 0;
+		lptr->plist[currpid] = 0;
 		int j = 0;
 		int stilluse = checkUse(ldes);
 		if(stilluse == 0) {
@@ -65,17 +65,12 @@ int checkUse(int ldes) {
 	struct lockent *lptr = &locktab[ldes];
 	int j = 0;
 	while(j < NPROC) {
-		if(lptr->procArray[j] == 1) {
+		if(lptr->plist[j] == 1) {
 			return 0;
 		}
 		j++;
 	}
 	return 1;
-	//for(j = 0; j < NPROC; j++) {
-	//	if(lptr->procArray[j] == 1) {
-	//		return 0;
-	//	}
-	//}
 }
 int maxWaitQueue(int ldes) {
 	struct lockent *lptr;
@@ -119,7 +114,7 @@ void resetPrio(int ld, int pid) {
 	}
 	maxprio = prptr->prprio;
 	for(tmplid = 0; tmplid < NLOCKS; tmplid++) {
-		if(locktab[tmplid].procArray[pid] > 0) {
+		if(locktab[tmplid].plist[pid] > 0) {
 			if(maxprio < locktab[tmplid].lprio) {
 				maxprio = locktab[tmplid].lprio;
 				iflag = 1;

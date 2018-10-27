@@ -26,7 +26,7 @@ local int newlock() {
 			locktab[lock].lstate = LUSED;
 			locktab[lock].lprio = -1;
 			for(j = 0; j < NPROC; j++) {
-				locktab[lock].procArray[j] = 0;
+				locktab[lock].plist[j] = 0;
 			}
 			return lock;
 		}
