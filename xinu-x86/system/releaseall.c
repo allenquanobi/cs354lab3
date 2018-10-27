@@ -4,7 +4,7 @@
 syscall releaseall (int32 numlocks, ...) {
 	intmask mask;
 	mask = disable();
-	int ldes, flag = 0;
+	int ldes;
 	struct lockent *lptr;
 	int i;
 	int returnValue = OK;
@@ -30,32 +30,7 @@ syscall releaseall (int32 numlocks, ...) {
 			resched();
 			continue;
 		}
-		if(nonempty(lptr->lqhead)) {
-			do {
-				flag = 0;
-				if(firstType(lptr->lqhead) == READ) {
-					lptr->lstate = READ_LOCKED;
-					flag = 1;
-				} else {
-					lptr->lstate = WRITE_LOCKED;
-				}
-				proctab[queuetab[(lptr->lqhead)].qnext].plock = -1;
-				proctab[queuetab[(lptr->lqhead)].qnext].nlocks--;
-				pid32 tmp = getfirst(lptr->lqhead);
-				ready(tmp);
-			} while (flag && (firstType(lptr->lqhead) == READ));
-		} else {
-			int j = 0;
-			while(i < NPROC) {
-				if(proctab[i].locks[ldes] == 1) {
-					j++;
-				}
-				i++;
-			}
-			if(j < 1) {
-				lptr->lstate = LUSED;
-			}
-		}
+		emptyWaitQueue(ldes);
 	}
 	resched();
 	restore(mask);

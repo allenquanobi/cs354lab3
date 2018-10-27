@@ -116,3 +116,55 @@ void resetPrio(int ld, int pid) {
 	restore(mask);
 	return;
 }
+void waitLock(int lid, int pid, int priority, int type) {
+	struct procent *prptr = &proctab[pid];
+	prptr->prstate = PR_WAIT;
+	prptr->plock = lid;
+	struct lockent *lptr = &locktab[lid];
+	lptr->lprio = max(lptr->lprio, proctab[pid].prprio);
+	swapPriority(lid, pid);
+	insertlockq(pid, lptr->lqhead, priority, type);
+	prptr->pwaitret = OK;
+	resched();
+	lptr->plist[pid] = 1;
+	proctab[pid].locks[lid] = 1;
+	proctab[pid].nlocks++;
+	int i;
+	for(i = 0; i < NPROC; i++) {
+		if(proctab[i].plock == lid) {
+			swapPriority(proctab[i].plock, i);
+		}
+	}
+}
+void emptyWaitQueue(int lid){
+	struct lockent *lptr = &locktab[lid];
+	int flag = 0;
+	int i = 0;
+	int j = 0;
+	if(nonempty(lptr->lqhead)) {
+		do {
+			flag = 0;
+			if(firstType(lptr->lqhead) == READ) {
+				lptr->lstate = READ_LOCKED;
+				flag = 1;
+			} else {
+				lptr->lstate = WRITE_LOCKED;
+			}
+			proctab[queuetab[(lptr->lqhead)].qnext].plock = -1;
+			proctab[queuetab[(lptr->lqhead)].qnext].nlocks--;
+			pid32 tmp = getfirst(lptr->lqhead);
+			ready(tmp);
+		} while (flag && (firstType(lptr->lqhead) == READ));
+	} else {
+		j = 0;
+		while(i < NPROC) {
+			if(proctab[i].locks[lid] == 1) {
+				j++;
+			}
+			i++;
+		}
+		if(j < 1) {
+			lptr->lstate = LUSED;
+		}
+	}
+}

@@ -9,7 +9,6 @@ extern	void	arp_in(struct arppacket *);
 extern	int32	arp_alloc();
 extern	void	arp_ntoh(struct arppacket *);
 extern	void	arp_hton(struct arppacket *);
-
 /*in file lab3functions.c */
 
 extern int insertlockq(int proc, int head, int key, int type);
@@ -17,7 +16,8 @@ extern void swapPriority(int ld, int pid);
 extern void resetPrio(int ld, int pid);
 extern int maxWaitQueue(int ldes);
 extern int checkUse(int ldes);
-
+extern void waitLock(int lid, int pid, int priority, int type);
+extern void emptyWaitQueue(int lid);
 /* in file ascdate.c */
 
 extern	status	ascdate(uint32, char *);

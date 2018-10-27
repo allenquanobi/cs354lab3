@@ -64,24 +64,7 @@ syscall lock(int32 ldes, int32 type, int32 priority) {
 			break;
 	}
 	if(shouldPutInWait) {
-		(prptr = &proctab[currpid])->prstate = PR_WAIT;
-		prptr->plock = lockid;
-		lptr->lprio = max(lptr->lprio,proctab[currpid].prprio);
-		swapPriority(lockid,currpid);
-		insertlockq(currpid,lptr->lqhead,priority,type);
-		prptr->pwaitret = OK;
-		resched();
-		lptr->plist[currpid] = 1;
-		proctab[currpid].locks[lockid] = 1;
-		proctab[currpid].nlocks++;
-		for(i=0;i<NPROC;i++)
-		{
-			if(proctab[i].plock == lockid)
-			{
-				swapPriority(proctab[i].plock,i);
-			}
-
-		}
+		waitLock(lockid, currpid, priority, type); 
 		restore(mask);
 		return prptr->pwaitret;
 	} else {
