@@ -32,7 +32,9 @@ pri16	chprio(
 		}
 	}
 	swapPriority(prptr->plock, pid);
-	resched();
+	if(prptr->prstate == PR_READY) {
+		resched();
+	}
 	restore(mask);
 	return oldprio;
 }
