@@ -1,8 +1,6 @@
 /*	releaseall.c - releaseall	*/
 #include <xinu.h>
 /* Lab 3: Complete this function */
-int isLockHeld(int ldesc);
-void makeReady(struct lockent *lptr, int pid, int lockid, int type);
 syscall releaseall (int32 numlocks, ...) {
 	intmask mask;
 	mask = disable();
@@ -59,6 +57,7 @@ syscall releaseall (int32 numlocks, ...) {
 		}
 	}
 	resched();
+	restore(mask);
 	return returnValue;
 }
 int checkUse(int ldes) {
