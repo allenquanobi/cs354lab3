@@ -26,7 +26,7 @@ syscall releaseall (int32 numlocks, ...) {
 		lptr->procArray[currpid] = 0;
 		int j = 0;
 		int stilluse = checkUse(ldes);
-		if(stilluse) {
+		if(stilluse == 0) {
 			resched();
 			continue;
 		}
@@ -46,10 +46,11 @@ syscall releaseall (int32 numlocks, ...) {
 			} while (flag && (firstType(lptr->lqhead) == READ));
 		} else {
 			int j = 0;
-			for(i = 0; i < NPROC; i++) {
+			while(i < NPROC) {
 				if(proctab[i].locks[ldes] == 1) {
 					j++;
 				}
+				i++;
 			}
 			if(j < 1) {
 				lptr->lstate = LUSED;
@@ -63,12 +64,18 @@ syscall releaseall (int32 numlocks, ...) {
 int checkUse(int ldes) {
 	struct lockent *lptr = &locktab[ldes];
 	int j = 0;
-	for(j = 0; j < NPROC; j++) {
+	while(j < NPROC) {
 		if(lptr->procArray[j] == 1) {
-			return 1;
+			return 0;
 		}
+		j++;
 	}
-	return 0;
+	return 1;
+	//for(j = 0; j < NPROC; j++) {
+	//	if(lptr->procArray[j] == 1) {
+	//		return 0;
+	//	}
+	//}
 }
 int maxWaitQueue(int ldes) {
 	struct lockent *lptr;

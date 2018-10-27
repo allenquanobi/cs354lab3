@@ -33,42 +33,35 @@ syscall lock(int32 ldes, int32 type, int32 priority) {
 	}
 	int shouldPutInWait = 0;
 	lptr = &locktab[lockid];
-	if ( READ == type )
-	{
-		if (lptr->lstate == LUSED)
-		{
-			shouldPutInWait = 0;
-		}
-		else if ( lptr->lstate == READ_LOCKED)
-		{
-			if ( priority > lptr->maxWritePrio)
-			{
-				shouldPutInWait = 0;
+	switch(type) {
+		case READ:
+			switch(lptr->lstate) {
+				case LUSED:
+					shouldPutInWait = 0;
+					break;
+				case READ_LOCKED:
+					if(priority > lptr->maxWritePrio) {
+						shouldPutInWait = 0;
+					} else {
+						shouldPutInWait = 1;
+					}
+					break;
+				default:
+					shouldPutInWait = 1;
 			}
-			else
-			{
-				shouldPutInWait = 1;
+			break;
+		case WRITE:
+			switch(lptr->lstate) {
+				case LUSED:
+					shouldPutInWait = 0;
+					break;
+				default:
+					shouldPutInWait = 1;
+					if(priority > lptr->maxWritePrio) {
+						lptr->maxWritePrio = priority;
+					}
 			}
-		}
-		else
-		{
-			shouldPutInWait = 1;
-		}
-
-	}
-	else
-	{
-		if (lptr->lstate == LUSED)
-		{
-			shouldPutInWait = 0;	
-		}
-		else
-		{
-			shouldPutInWait = 1;
-			if(priority > lptr->maxWritePrio) {
-				lptr->maxWritePrio = priority;
-			}
-		}
+			break;
 	}
 	if(shouldPutInWait) {
 		(prptr = &proctab[currpid])->prstate = PR_WAIT;
